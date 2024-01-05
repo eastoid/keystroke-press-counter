@@ -37,7 +37,7 @@ private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob(
 
 
 // Configuration
-const val logFrequency = 75
+const val logFrequency = 750
 val logFileName = "KeystrokeCount_${startTime.dayOfMonth}-T-${startTime.hour}-${startTime.minute}-${startTime.second}.txt"
 val logFileLocation = System.getProperty("user.home") + File.separator + "Desktop"
 
@@ -64,8 +64,13 @@ fun main() {
 
 fun registerListener() {
     val listener = object : NativeKeyListener {
-        override fun nativeKeyPressed(nativeEvent: NativeKeyEvent?) {
+//        override fun nativeKeyPressed(nativeEvent: NativeKeyEvent?) {
+//            coroutineScope.launch {
+//                nativeEvent.count()
+//            }
+//        }
 
+        override fun nativeKeyReleased(nativeEvent: NativeKeyEvent?) {
             coroutineScope.launch {
                 nativeEvent.count()
             }
@@ -79,7 +84,24 @@ fun registerListener() {
 // Handle a key press event
 fun NativeKeyEvent?.count() {
     this ?: return
-    val key = NativeKeyEvent.getKeyText(this.keyCode)
+
+    val shiftModifier = this.modifiers and NativeKeyEvent.SHIFT_MASK != 0
+    val ctrlModifier = this.modifiers and NativeKeyEvent.CTRL_MASK != 0
+    val altModifier = this.modifiers and NativeKeyEvent.ALT_MASK != 0
+    val capsModifier = this.modifiers and NativeKeyEvent.CAPS_LOCK_MASK != 0
+
+    val key = if (!shiftModifier && !ctrlModifier && !altModifier && !capsModifier) {
+        NativeKeyEvent.getKeyText(this.keyCode)
+    } else {
+        val s = StringBuilder()
+        if (shiftModifier) s.append("Shift+")
+        if (ctrlModifier) s.append("Ctrl+")
+        if (altModifier) s.append("Alt+")
+        if (capsModifier) s.append("Caps+")
+        s.append(NativeKeyEvent.getKeyText(this.keyCode))
+        s.toString()
+    }
+
     countMap[key] = (countMap[key] ?: 0) + 1
     keyPresses++
 
@@ -87,11 +109,13 @@ fun NativeKeyEvent?.count() {
 }
 
 
+
 // Save data to file (Desktop)
 fun saveToFile() {
     try {
         val desktopPath = logFileLocation
         val file = File(desktopPath, logFileName)
+
 
         PrintWriter(file).use { out ->
             out.println(dataToText())
