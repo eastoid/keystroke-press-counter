@@ -1,11 +1,17 @@
 ## Key Press Counter
 
 Count how many times individual keys have been pressed.<br>
-Does NOT include characters produced with the use of modifiers (Shift, CAPS).<br>
-Includes minimal tray icon
+Modifiers are prefixed to the character.<br>
+Minimal tray icon is present (Open log, exit)
+
+By default logs data into file every 750th event. Logs on exit or View Log through tray icon.
 
 ---
+###### v1.1.0
 ### Example Log Format:
-![image](https://github.com/eastoid/key-press-counter/assets/82464360/c51f4646-56b7-4de4-a5d5-d685f6818aca)
+![image](https://github.com/eastoid/keystroke-press-counter/assets/82464360/a9755f5e-6344-4dfa-b570-364e7f8d1a4d)
+
 
 Default filename consists of: Name, Current day, Hour, Minutes, Seconds.
+
+
